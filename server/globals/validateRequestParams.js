@@ -1,10 +1,10 @@
 
 /**
  * @validateRequestParams
- * @param {*} reqParams this is the request parameters
- * @param {*} model this is the model that we want to validate
- * @param {*} stopOnFirstError this is a boolean that if true, will stop on first error
- * @param {*} shouldAcceptOutOfModelParams this is a boolean that if true, will accept out of model parameters
+ * @param {disc} reqParams this is the request parameters
+ * @param {disc} model this is the model that we want to validate
+ * @param {boolean} stopOnFirstError @default true this is a boolean that if true, will stop on first error
+ * @param {boolean} shouldAcceptOutOfModelParams @default false this is a boolean that if true, will accept out of model parameters
  *   ----------------------------------------------------------------
  *  | shouldAcceptOutOfModelParams (recommended = false)             |
  *  | if true then it's possible to give an error or hack the server |
