@@ -7,7 +7,7 @@
  * @param {boolean} shouldAcceptOutOfModelParams @default false this is a boolean that if true, will accept out of model parameters
  *   ----------------------------------------------------------------
  *  | shouldAcceptOutOfModelParams (recommended = false)             |
- *  | if true then it's possible to give an error or hack the server |
+ *  | if true then it's possible to give an error or crash the server |
  *   ----------------------------------------------------------------
  */
 function validateRequestParams(reqParams = {}, model = {}, stopOnFirstError = true, shouldAcceptOutOfModelParams = false) {
