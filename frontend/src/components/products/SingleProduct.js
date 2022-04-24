@@ -91,12 +91,12 @@ function SingleProduct(props) {
         )
     }
 
-    const handleOnChange = (e) => {
-        const { name, value } = e.target
+    const handleOnChange = (e,number=false) => {
+        const { name='', value } = e.target
         if (name === 'image') {
             updateKeys[name] = URL.createObjectURL(e.target.files[0])
         } else {
-            updateKeys[name] = value
+            updateKeys[name] = number ? Number(value) : value
         }
     }
 
@@ -114,7 +114,7 @@ function SingleProduct(props) {
             </td>
             <td style={{ verticalAlign: "middle" }}><EditableComponent tag="Input" placeholder="Product Name" type="text" name="name" onChange={handleOnChange} /></td>
             <td style={{ verticalAlign: "middle" }}><EditableComponent tag="Input" placeholder="Product Price" type="number" name="price" onChange={handleOnChange} style={{ maxWidth: 100 }} /></td>
-            <td style={{ verticalAlign: "middle" }}><EditableComponent tag="Select" selectedId={category_id} options={categories} defaultValue={categories.find(e => e.id === category_id).name} onChange={handleOnChange} name="category" /></td>
+            <td style={{ verticalAlign: "middle" }}><EditableComponent tag="Select" selectedId={category_id} options={categories} defaultValue={(categories.find(e => e.id === category_id) || {})?.name} onChange={e=>handleOnChange(e,true)} name="category" /></td>
             <td style={{ verticalAlign: "middle" }}><EditableComponent tag="Textarea" placeholder="Product Description" onChange={handleOnChange} value={props.description} name="description" /></td>
             <td style={{ verticalAlign: "middle" }}>{moment(created_at).format('YYYY-MMMM-DD')}</td>
             <td style={{ verticalAlign: "middle" }}>{moment(updated_at).format('YYYY-MMMM-DD')}</td>

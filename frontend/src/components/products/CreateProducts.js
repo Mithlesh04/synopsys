@@ -68,6 +68,7 @@ function CreateProducts(){
                 <FormGroup style={{ ...styles.forms, textAlign: 'center' }}>
                     <ProductImage 
                         onChange={e => {
+                            console.log('e = ',e.target.files[0])
                             setProduct(prev => ({ ...prev, image: e.target.files[0] }))
                         }}
                         image={product.image ? URL.createObjectURL(product.image) : defaultProductImage} 

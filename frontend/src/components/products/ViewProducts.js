@@ -46,14 +46,18 @@ function ViewProducts() {
                 if(res){
                     if(res.data.isValid){
                         toast.success(res.data.message)
-                        setProducts(prev=>{
-                            return prev.map((p,i)=>{
+                        setProducts(prev=>
+                            prev.map((p,i)=>{
                                 if(i===index){
-                                    return {...p, ...keys}
+                                    const { category, ...rest } = keys
+                                    return {
+                                        ...p, ...rest, 
+                                        ...category && {category_id: category}
+                                    }
                                 }
                                 return p
                             })
-                        })
+                        )
                     }else{
                         toast.error(res.data.message)
                     }

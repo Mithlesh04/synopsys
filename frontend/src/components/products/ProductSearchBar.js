@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Row,Col, Form, Container, FormGroup, FormControl } from "react-bootstrap"
 
-const searchColumns = ['id','name', 'price', 'description'];
+const searchColumns = ['id','category','name', 'price', 'description'];
 
 function ProductSearchBar({ handleGetProducts }) {
     const [searchBy, setSearchBy] = useState('id');
@@ -20,7 +20,7 @@ function ProductSearchBar({ handleGetProducts }) {
                   </Col>
                 <Col>
                     <FormGroup >
-                        <Form.Select value={searchBy} required onChange={_=>setSearchBy(_.target.value)} name="category">
+                        <Form.Select value={searchBy} name="category" className="text-capitalize"  onChange={_=>setSearchBy(_.target.value)} required>
                             {
                                 searchColumns.map((name) => <option key={name} value={name}>{name}</option>)
                             }
