@@ -88,7 +88,6 @@ function getProduct(req, res) {
         try{
             // search = { key : value }
             let s = Object.entries(JSON.parse(search))[0]     
-            console.log('s = ',s)
             if(s[0] === 'category') {
                 query += `
                          AND category_id IN (
