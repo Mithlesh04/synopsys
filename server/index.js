@@ -1,35 +1,64 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const upload = require('multer')({dest:'uploads/'});
+const upload = require('multer')({ dest: 'uploads/' });
 const cors = require('cors');
+const http = require('http').Server(app);
 const port = 5000;
 
 
 app.use(cors());
 
 // for parsing application/xwww-
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.urlencoded({ extended: true }));
 //form-urlencoded
 
 // for parsing application/json
-app.use(bodyParser.json()); 
+app.use(bodyParser.json());
 
 // for parsing multipart/form-data
 // app.use(upload.array()); 
-app.use(upload.any()); 
+app.use(upload.any());
 app.use(express.static('public'));
 
 
-// routes
-app.use('/products',require('./routes/products'));
+// products routes
+app.use('/products', require('./routes/products'));
+
+
+
+const socketIo = require("socket.io")(http, {
+    cors: {
+        origin: "*",
+        reconnection: true,
+        reconnectionDelay: 10000
+        // methods: ["GET", "POST"],
+        // allowedHeaders: ["my-custom-header"],
+        // credentials: true
+    }
+})
+
 
 app.get('/', (req, res) => {
     res.send('hello world')
 });
 
 
-app.listen(port, (e) => {
-        console.log('listening on port = ',port);
-    }
-);
+
+// socket connection
+http.listen(port, (e) => {
+    console.log('listening on port = ', port);
+})
+
+
+const io = socketIo.of('/');
+
+io.on('connection', (socket) => {
+    console.log('socket user connected');
+    socket.on('test', function (from, msg) {
+        console.log('test', from, ' saying ', msg);
+    });
+})
+
+
+

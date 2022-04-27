@@ -1,4 +1,4 @@
-import React, { useState,useEffect,  useRef } from "react";
+import React, { useState,useEffect } from "react";
 import { Button, Form, Container, FormGroup, FormControl } from "react-bootstrap"
 import { createProductApi, getCategoriesApi } from "../../api/productsApi";
 import { toast } from 'react-toastify';
