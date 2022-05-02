@@ -38,6 +38,9 @@ const socketIo = require("socket.io")(http, {
     }
 })
 
+// set socket.io listeners
+app.set('socketIo', socketIo);
+
 
 app.get('/', (req, res) => {
     res.send('hello world')
@@ -53,11 +56,68 @@ http.listen(port, (e) => {
 
 const io = socketIo.of('/');
 
+const {
+    addUser,
+    removeUser,
+    getUser,
+    getUsersInRoom
+  } = require('./utils/User');
+
 io.on('connection', (socket) => {
-    console.log('socket user connected');
+
+    socket.on('join', ({ username, room }, callback) => {
+        const { error, user } = addUser({ id: socket.id, name: username, room }); // add user with socket id and room info
+        if (error) return callback(error);
+
+        socket.join(user.room);
+        // socket.join(user.room);
+
+        socket.emit('message', {
+            user: 'adminX',
+            text: `${user.name.toUpperCase()}, Welcome to ${user.room} room.`
+        });
+        console.log('user.room = ',user.room)
+        socket.broadcast.to(user.room).emit('message', {
+            user: 'adminX',
+            text: `${user.name.toUpperCase()} has joined!`
+        });
+
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room) // get user data based on user's room
+        });
+
+        callback();
+    });
+
+    socket.on('sendMessage', (message, callback) => {
+        const user = getUser(socket.id);
+
+        io.to(user.room).emit('message', { user: user.name, text: message });
+
+        callback();
+    });
+
+    socket.on('disconnect', () => {
+        const user = removeUser(socket.id);
+      
+        if (user) {
+          io.to(user.room).emit('message', {
+            user: 'adminX',
+            text: `${user.name.toUpperCase()} has left.`
+          });
+          io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room)
+          });
+        }
+    });
+
+   
     socket.on('test', function (from, msg) {
         console.log('test', from, ' saying ', msg);
     });
+
 })
 
 

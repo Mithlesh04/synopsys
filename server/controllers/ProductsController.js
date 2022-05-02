@@ -172,11 +172,19 @@ function updateProductDetails(req, res) {
                 message: 'Error updating product'
             })
         } else {
+
+            // send notification to all users
+            let io = req.app.get("socketIo")//.emit('pUpdate', validate.data);
+
+            // emit data not to the current user
+            
+            
             sendResponse(res, 200, {
                 status: 200,
                 isValid: true,
                 message: 'Product updated successfully'
             })
+
         }
     })
 }
