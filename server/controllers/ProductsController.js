@@ -135,15 +135,20 @@ function getProduct(req, res) {
 //     }
 // })
 
-function updateProductDetails(req, res) {
+function updateProductDetails(req, res, isSocketRequest=false) {
     const body = req.body;
 
     if (!body.id) {
-        return sendResponse(res, 200, {
+        let msg = {
             status: 400,
             isValid: false,
             message: 'Product id is required'
-        })
+        }
+        if(isSocketRequest){
+            return msg
+        }else{
+            return sendResponse(res, 200, msg)
+        }
     }
 
     const validObjModel = {}
@@ -164,29 +169,45 @@ function updateProductDetails(req, res) {
     }
     
 
-    conn.query(`UPDATE products SET ? WHERE id=${body.id}`, validate.data, (err, result) => {
-        if (err) {
-            sendResponse(res, 200, {
-                status: 200,
-                isValid: false,
-                message: 'Error updating product'
-            })
-        } else {
-
-            // send notification to all users
-            let io = req.app.get("socketIo")//.emit('pUpdate', validate.data);
-
-            // emit data not to the current user
-            
-            
-            sendResponse(res, 200, {
-                status: 200,
-                isValid: true,
-                message: 'Product updated successfully'
-            })
-
-        }
+   function dbUpdate(){
+    return new Promise((resolve, reject) => {
+        conn.query(`UPDATE products SET ? WHERE id=${body.id}`, validate.data, (err, result) => {
+            if (err) {
+                let msg = {
+                    status: 200,
+                    isValid: false,
+                    message: 'Error updating product'
+                }
+                if(isSocketRequest)reject({...msg,...validate.data,id:body.id});
+                else reject(sendResponse(res, 200, msg))
+            } else {
+    
+                // send notification to all users
+                // let io = req.app.get("socketIo")//.emit('pUpdate', validate.data);
+                // of:- namespace, to:- room
+                // io.of('product').to('product').emit('pUpdate', {
+                //     ...validate.data,
+                //     id: body.id
+                // });
+                // console.log('id= ',io)
+    
+                // emit data not to the current user   
+                let msg=  {
+                    status: 200,
+                    isValid: true,
+                    message: 'Product updated successfully'
+                }
+                if(isSocketRequest)resolve({...msg,...validate.data,id:body.id});
+                else resolve(sendResponse(res, 200, msg))
+    
+            }
+        })
     })
+   }
+
+    
+    return dbUpdate()
+
 }
 
 

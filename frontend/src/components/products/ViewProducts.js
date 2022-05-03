@@ -4,6 +4,9 @@ import { getProductApi, getCategoriesApi, updateProductDetailsApi, deleteProduct
 import { toast } from 'react-toastify';
 import SingleProduct from './SingleProduct';
 import ProductSearchBar from './ProductSearchBar';
+import { UpdateProduct, CurrentUserNotification } from './../../socket/product'
+
+
 
 function ViewProducts() {
     const [products, setProducts] = useState([])
@@ -14,6 +17,29 @@ function ViewProducts() {
         const result = await getProductApi(params)
         if(result){
             setProducts(result.data.data||[])
+        }
+    }
+
+    const handleSocketUpdate = (res)=>{
+        console.log('current user = ',res)
+        if (res) {
+            const { category, isValid, id, message, status,...rest } = res
+            if (isValid) {
+                toast.success(message)
+                setProducts(prev =>
+                    prev.map((p, i) => {
+                        if (p.id === id) {
+                            return {
+                                ...p, ...rest,
+                                ...category && { category_id: category }
+                            }
+                        }
+                        return p
+                    })
+                )
+            } else {
+                toast.error(message)
+            }
         }
     }
 
@@ -42,26 +68,30 @@ function ViewProducts() {
                 }
             }
             if(isValid){
-                const res = await updateProductDetailsApi({id,...keys})
-                if(res){
-                    if(res.data.isValid){
-                        toast.success(res.data.message)
-                        setProducts(prev=>
-                            prev.map((p,i)=>{
-                                if(i===index){
-                                    const { category, ...rest } = keys
-                                    return {
-                                        ...p, ...rest, 
-                                        ...category && {category_id: category}
-                                    }
-                                }
-                                return p
-                            })
-                        )
-                    }else{
-                        toast.error(res.data.message)
-                    }
-                }
+                UpdateProduct({
+                    id,
+                    ...keys
+                })
+                // const res = await updateProductDetailsApi({id,...keys})
+                // if(res){
+                //     if(res.data.isValid){
+                //         toast.success(res.data.message)
+                //         setProducts(prev=>
+                //             prev.map((p,i)=>{
+                //                 if(i===index){
+                //                     const { category, ...rest } = keys
+                //                     return {
+                //                         ...p, ...rest, 
+                //                         ...category && {category_id: category}
+                //                     }
+                //                 }
+                //                 return p
+                //             })
+                //         )
+                //     }else{
+                //         toast.error(res.data.message)
+                //     }
+                // }
             }
         }
     }
@@ -88,7 +118,8 @@ function ViewProducts() {
     }
 
     useEffect(() => {
-        
+        const socket = CurrentUserNotification(handleSocketUpdate)
+
         handleGetProducts()
         getCategoriesApi().then(res => {
             if(res){
@@ -97,6 +128,10 @@ function ViewProducts() {
         }).catch(err => {
             console.log(err);
         })
+
+        return () => {
+            socket()
+        }
     }, [])
 
     const [sortedKey] = Object.entries(sortKey)[0] || []
