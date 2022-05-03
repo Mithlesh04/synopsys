@@ -30,7 +30,7 @@ function App() {
     return ()=>{
       socket()
     }
-  })
+  },[])
 
   return (
     <>
